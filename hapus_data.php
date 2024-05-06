@@ -1,46 +1,29 @@
 <?php
+// File: hapus_data.php
 
 // Koneksi ke database
-$host = 'localhost';
-$username = 'root';
-$password = '';
-$database = 'penjualan_obat';
-$koneksi = new mysqli($host, $username, $password, $database);
+$servername = "localhost";
+$username = "root";
+$password = "";
+$database = "penjualan_obat";
+
+$conn = new mysqli($servername, $username, $password, $database);
 
 // Periksa koneksi
-if ($koneksi->connect_error) {
-    die("Koneksi gagal: " . $koneksi->connect_error);
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
 }
 
-// Periksa apakah parameter id telah diterima
-if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+// Ambil ID yang akan dihapus dari parameter GET
+$Id = $_GET['Id'];
 
-    // Query untuk menghapus data berdasarkan id
-    $query = "DELETE FROM penjualan_obat WHERE id=$id";
+// Hapus data dari tabel
+$sql = "DELETE FROM pengelolaan_penjualan WHERE id = $id";
 
-    if ($koneksi->query($query) === TRUE) {
-        // Jika penghapusan berhasil, ambil data terbaru dan kirimkan kembali dalam bentuk JSON
-        $query_select = "SELECT * FROM penjualan_obat";
-        $result = $koneksi->query($query_select);
-        $data = array();
-
-        if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                $data[] = $row;
-            }
-        }
-
-        // Tutup koneksi
-        $koneksi->close();
-
-        // Mengembalikan data terbaru dalam bentuk JSON
-        echo json_encode($data);
-    } else {
-        echo "Error: " . $query . "<br>" . $koneksi->error;
-    }
+if ($conn->query($sql) === TRUE) {
+    echo "Data berhasil dihapus";
 } else {
-    echo "Parameter id tidak ditemukan";
+    echo "Error: " . $sql . "<br>" . $conn->error;
 }
-
+$conn->close();
 ?>
