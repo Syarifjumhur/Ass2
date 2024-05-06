@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Penjualan Obat</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+<h2>Data Penjualan Obat</h2>
+
+<!-- Form untuk menambahkan data baru -->
+<form id="form-tambah">
+    <label for="nama-obat">Nama Obat:</label>
+    <input type="text" id="nama-obat" name="nama_obat"><br>
+    <label for="jumlah">Jumlah:</label>
+    <input type="number" id="jumlah" name="jumlah"><br>
+    <label for="harga">Harga:</label>
+    <input type="number" id="harga" name="harga"><br>
+    <button type="button" onclick="tambahData()">Simpan</button>
+</form>
+
+<!-- Tabel untuk menampilkan data -->
+<table id="data-table" border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nama Obat</th>
+            <th>Jumlah</th>
+            <th>Harga</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+// Panggil data menggunakan AJAX saat halaman dimuat
+$(document).ready(function(){
+    loadData();
+});
+
+// Fungsi untuk memuat data
+function loadData() {
+    $.ajax({
+        url: 'http://localhost/get_data.php',
+        type: 'GET',
+        success: function(response){
+            var data = JSON.parse(response);
+            var tbody = $('#data-table tbody');
+
+            // Kosongkan tabel sebelum menambahkan data baru
+            tbody.empty();
+
+            // Tambahkan data ke dalam tabel
+            data.forEach(function(row){
+                var tr = $('<tr>');
+                tr.append('<td>' + row.id + '</td>');
+                tr.append('<td>' + row.nama_obat + '</td>');
+                tr.append('<td>' + row.jumlah + '</td>');
+                tr.append('<td>' + row.harga + '</td>');
+                tr.append('<td><button onclick="hapusData(' + row.id + ')">Hapus</button></td>');
+                tbody.append(tr);
+            });
+        }
+    });
+}
+
+// Fungsi untuk menghapus data menggunakan AJAX
+function hapusData(id) {
+    $.ajax({
+        url: 'http://localhost/hapus_data.php?id=' + id,
+        type: 'GET',
+        success: function(response){
+            // Tampilkan pesan konfirmasi bahwa data telah dihapus
+            alert('Data berhasil dihapus');
+
+            // Perbarui tabel setelah penghapusan berhasil
+            loadData();
+        }
+    });
+}
+
+// Fungsi untuk menambahkan data baru menggunakan AJAX
+function tambahData() {
+    var formData = $('#form-tambah').serialize();
+    $.ajax({
+        url: 'http://localhost/tambah_data.php',
+        type: 'POST',
+        data: formData,
+        success: function(response){
+            // Tampilkan pesan konfirmasi bahwa data telah ditambahkan
+            alert('Data berhasil ditambahkan');
+
+            // Kosongkan form setelah data ditambahkan
+            $('#form-tambah').trigger('reset');
+
+            // Perbarui tabel setelah penambahan berhasil
+            loadData();
+        }
+    });
+}
+</script>
+
+</body>
+</html>
